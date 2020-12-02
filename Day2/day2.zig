@@ -18,34 +18,16 @@ pub fn main() !void {
     std.debug.print("Part 2: {}\n", .{p2_count});
 }
 
-fn part1(input: []const u8) !usize {
-    var it = std.mem.split(input, "\n");
-
-    var count: usize = 0;
-    while (it.next()) |line| {
-        if(line.len == 0) { continue; }
-        
-        var line_it = std.mem.split(line, " ");
-        const range = line_it.next().?;
-
-        var range_it = std.mem.split(range, "-");
-        const min = try std.fmt.parseInt(i64, range_it.next().?, 10);
-        const max = try std.fmt.parseInt(i64, range_it.next().?, 10);
-
-        const letter = line_it.next().?;
-
-        const password = line_it.next().?;
-
+fn p1_predicate(lower: usize, higher: usize, letter: []const u8, password: []const u8) bool {
         const letter_count = std.mem.count(u8, password, letter[0..1]);
-        if (letter_count >= min and letter_count <= max) {
-            count +=1;
-        }
-    }
-
-    return count;
+    return letter_count >= lower and letter_count <= higher;
 }
 
-fn part2(input: []const u8) !usize {
+fn part1(input: []const u8) !usize {
+    return do_both_with_predicate(input, p1_predicate);
+}
+
+fn do_both_with_predicate(input: []const u8, predicate: anytype) !usize {
     var it = std.mem.split(input, "\n");
 
     var count: usize = 0;
@@ -63,13 +45,21 @@ fn part2(input: []const u8) !usize {
 
         const password = line_it.next().?;
 
-        const at_pos_1 = @as(u64, @boolToInt(password[pos1 - 1] == letter[0]));
-        const at_pos_2 =  @as(u64, @boolToInt(password[pos2-1] == letter[0]));
-
-        if (at_pos_1 ^ at_pos_2 != 0) {
+        if (predicate(pos1, pos2, letter, password)) {
             count += 1;
         }
     }
 
     return count;
+}
+
+fn p2_predicate(lower: usize, higher: usize, letter: []const u8, password: []const u8) bool {
+        const at_pos_1 = @as(u64, @boolToInt(password[lower - 1] == letter[0]));
+        const at_pos_2 =  @as(u64, @boolToInt(password[higher-1] == letter[0]));
+
+        return (at_pos_1 ^ at_pos_2) != 0;
+}
+
+fn part2(input: []const u8) !usize {
+    return do_both_with_predicate(input, p2_predicate);
 }
