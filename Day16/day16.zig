@@ -96,7 +96,7 @@ fn solve(m_ticket: []const u8, tickets: []const u8) !Sln {
     var valid_tickets = std.ArrayList([]const u8).init(alloc);
     defer valid_tickets.deinit();
 
-    var err_code: usize = 0;
+    var err_code: usize = 0; // THIS IS RETURNED AS P1 SLN
     var t_it = std.mem.split(tickets, "\n");
     _ = t_it.next(); // remove "Other tickets:"
     while(t_it.next()) |ticket| {
@@ -113,6 +113,10 @@ fn solve(m_ticket: []const u8, tickets: []const u8) !Sln {
             try valid_tickets.append(ticket);
         }
     }
+
+    /////////////////
+    // PART 2 below /
+    /////////////////
 
     var possible_values = std.ArrayList(std.ArrayList([]const u8)).init(alloc);
     defer {
